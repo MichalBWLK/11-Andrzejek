@@ -1,0 +1,50 @@
+managed implementation in class YBP_R_MB11FILES unique;
+strict ( 2 );
+with draft;
+define behavior for YR_MB11FILES alias Files
+persistent table YMB11FILES
+draft table YMB11FILES_D
+etag master Lastchangedat
+lock master total etag Lastchangedat
+authorization master( global )
+
+{
+  field ( mandatory : create )
+   Scenario,
+   FilePurpose;
+
+  field ( readonly )
+   Createdby,
+   Createdat,
+   Lastchangedby,
+   Lastchangedat;
+
+  field ( readonly : update )
+   Scenario,
+   FilePurpose;
+
+
+  create;
+  update;
+  delete;
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for YMB11FILES
+  {
+    Scenario = scenario;
+    FilePurpose = file_purpose;
+    ScenarioDescription = scenario_description;
+    Attachment = attachment;
+    Mimetype = mimetype;
+    Filename = filename;
+    Createdby = createdby;
+    Createdat = createdat;
+    Lastchangedby = lastchangedby;
+    Lastchangedat = lastchangedat;
+  }
+}

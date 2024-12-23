@@ -1,0 +1,67 @@
+@Metadata.layer: #CORE
+@UI.headerInfo.title.type: #STANDARD
+@UI.headerInfo.title.value: 'Scenario'
+@UI.headerInfo.description.type: #STANDARD
+@UI.headerInfo.description.value: 'Scenario'
+annotate view YC_MB11FILES with
+{
+  @EndUserText.label: 'Scenario ID'
+  @UI.facet: [ {
+    label: 'Application files', 
+    id: 'GeneralInfo', 
+    purpose: #STANDARD, 
+    position: 10 , 
+    type: #IDENTIFICATION_REFERENCE
+  } ]
+  @UI.identification: [ {position: 10 , label: 'Scenario ID'} ]
+  @UI.lineItem: [ {position: 10 , label: 'Scenario ID'} ]
+  @UI.selectionField: [ { position: 10 } ]
+  Scenario;
+  
+  @UI.identification: [ {position: 20,label: 'file purpose'} ]
+  @UI.lineItem: [ {position: 20,label: 'file purpose' } ]
+  @UI.selectionField: [ {position: 20 } ]
+  FilePurpose;
+  
+  @UI.identification: [ {position: 30,label: 'scenario description' } ]
+  @UI.lineItem: [ {position: 30,label: 'scenario description'} ]
+  @UI.selectionField: [ {position: 30 } ]
+  ScenarioDescription;
+  
+  @UI.identification: [ {position: 40,label: 'attachment'} ]
+  @UI.lineItem: [ {position: 40,label: 'attachment' } ]
+  @UI.fieldGroup: [{ qualifier: 'the_file', label: 'attachment' }]
+  Attachment;
+  
+  @UI.identification: [ {position: 50,label: 'Mime type'} ]
+  @UI.lineItem: [ {position: 50,label: 'Mime type' } ]
+  @UI.selectionField: [ {position: 50 } ]
+  @UI.hidden: true
+  Mimetype;
+  
+  @UI.identification: [ {position: 60,label: 'file name'} ]
+  @UI.lineItem: [ {position: 60,label: 'file name' } ]
+  @UI.selectionField: [ {position: 60 } ]
+  @UI.hidden: true
+  Filename;
+  
+  @UI.identification: [ {position: 70,label: 'created by'} ]
+  @UI.lineItem: [ {position: 70,label: 'created by' } ]
+  @UI.selectionField: [ {position: 70 } ]
+  Createdby;
+  
+  @UI.identification: [ {position: 80,label: 'created at'} ]
+  @UI.lineItem: [ {position: 80,label: 'created at'} ]
+  @UI.selectionField: [ {position: 80 } ]
+  Createdat;
+  
+  @UI.identification: [ {position: 90,label: 'changed by'} ]
+  @UI.lineItem: [ {position: 90,label: 'changed by' } ]
+  @UI.selectionField: [ {position: 90 } ]
+  Lastchangedby;
+  
+  @UI.identification: [ {position: 100,label: 'changed at'} ]
+  @UI.lineItem: [ {position: 100,label: 'changed at' } ]
+  @UI.selectionField: [ {position: 100 } ]
+  Lastchangedat;
+}

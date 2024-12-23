@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for YC_MB11FILES'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'YC_MB11FILES'
+  }
+}
+define service YUI_MB11FILES_O4 provider contracts odata_v4_ui {
+  expose YC_MB11FILES as Files;
+}
