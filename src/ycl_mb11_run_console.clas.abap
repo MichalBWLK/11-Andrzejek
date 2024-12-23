@@ -24,7 +24,7 @@ CLASS ycl_mb11_run_console IMPLEMENTATION.
 *    read_gifts( out ).
 
     DATA(andrzejek) = new ycl_mb11_andrzejek( i_scenario = 1 ).
-    DATA(time) = andrzejek->execute( i_scenario = 10102 i_scenario_descr = 'pierwszy, 0,1 MLN krokow' i_no_of_steps = 100000 ).
+    DATA(time) = andrzejek->execute( i_scenario = 10103 i_scenario_descr = 'pierwszy, 0,1 MLN, refakt. cargo' i_no_of_steps = 100000 ).
     DATA(to_go) = lines( andrzejek->get_remaining_gifts( ) ).
 *    DATA(journal) = andrzejek->get_journal( ).
     out->write( `time: ` && time )->write( `left gifts: ` && to_go )."->write( journal ).

@@ -8,20 +8,18 @@ CLASS ycl_mb11_cargo DEFINITION
     INTERFACES yif_mb11_cargo
       ABSTRACT METHODS: load unload.
 
-    ALIASES: load FOR yif_mb11_cargo~load,
+    ALIASES: unloading_happened FOR yif_mb11_cargo~unloading_happened,
+             loading_happened FOR yif_mb11_cargo~loading_happened,
+             load FOR yif_mb11_cargo~load,
              unload FOR yif_mb11_cargo~unload,
              set_location FOR yif_mb11_cargo~set_location,
-             get_remaining_gifts FOR yif_mb11_cargo~get_remaining_gifts.
-
-    DATA: unloading_happened TYPE abap_bool READ-ONLY,
-          loading_happened TYPE abap_bool READ-ONLY.
+             get_remaining_gifts FOR yif_mb11_cargo~get_remaining_gifts,
+             clear_flags FOR yif_mb11_cargo~clear_flags.
 
     METHODS constructor
       IMPORTING
         i_journal  TYPE REF TO ycl_mb11_journal
         i_scenario TYPE int2.
-
-
 
   PROTECTED SECTION.
     TYPES: ty_gift  TYPE REF TO ymb11gifts,
@@ -75,6 +73,10 @@ CLASS ycl_mb11_cargo IMPLEMENTATION.
 
   METHOD calc_target_city.
     result = floor( i_gift / 100 ).
+  ENDMETHOD.
+
+  METHOD yif_mb11_cargo~clear_flags.
+    clear: loading_happened, unloading_happened.
   ENDMETHOD.
 
 ENDCLASS.

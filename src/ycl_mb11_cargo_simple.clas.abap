@@ -16,6 +16,7 @@ ENDCLASS.
 CLASS ycl_mb11_cargo_simple IMPLEMENTATION.
 
   METHOD yif_mb11_cargo~load.
+    clear: loading_happened.
     IF loaded_volume + 5 >= max_volume OR loaded_weight + 5 >= max_weight.
       RETURN.
     ENDIF.
@@ -35,6 +36,7 @@ CLASS ycl_mb11_cargo_simple IMPLEMENTATION.
   METHOD yif_mb11_cargo~unload.
     DATA: gifts_2b_deleted TYPE TABLE OF int4.
 
+    clear: unloading_happened.
     LOOP AT loaded_gifts ASSIGNING FIELD-SYMBOL(<gift>).
       IF calc_target_city( <gift>->gift ) = current_location.
         "we're home, unload and delete from gifts.

@@ -30,12 +30,7 @@ CLASS ycl_mb11_andrzejek DEFINITION
     DATA: cargo_manager TYPE REF TO yif_mb11_cargo,
           journal TYPE REF TO ycl_mb11_journal.
 
-    DATA: all_gifts       TYPE ycl_mb11_input_reader=>ty_gifts,
-          all_connections TYPE ycl_mb11_input_reader=>ty_connections.
-
-    DATA: loaded_gifts  TYPE ty_gifts,
-          loaded_weight TYPE int2,
-          loaded_volume TYPE int2.
+    DATA: all_connections TYPE ycl_mb11_input_reader=>ty_connections.
 
     DATA: initial_connection TYPE ymb11connections,
           last_connection TYPE REF TO ymb11connections,
@@ -58,8 +53,8 @@ CLASS ycl_mb11_andrzejek DEFINITION
       RETURNING
         VALUE(result) TYPE ymb11_city.
 
-    METHODS simple_unload.
-    METHODS simple_load.
+
+
     METHODS simple_select_city.
     METHODS make_move.
     METHODS generate_seed
@@ -78,7 +73,6 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
       i_scenario = i_scenario
     ).
     DATA(input) = NEW ycl_mb11_input_reader( i_scenario ).
-    all_gifts = input->get_gifts( ).
     all_connections = input->get_connections( ).
     initial_connection = VALUE #( src = 0 dest = 0 time = 0 ).
     last_connection = REF #( initial_connection ).
@@ -101,7 +95,7 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
 
 
   METHOD get_remaining_gifts.
-    result = me->all_gifts.
+    result = cargo_manager->get_remaining_gifts( ).
   ENDMETHOD.
 
 
@@ -123,13 +117,14 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
 
 
   METHOD unload.
-*    cargo_manager->set_location( i_location =  ).
-    simple_unload( ).
+    cargo_manager->set_location( i_location = last_connection->dest ).
+    cargo_manager->unload( ).
   ENDMETHOD.
 
 
   METHOD load.
-    simple_load( ).
+    cargo_manager->set_location( i_location = last_connection->dest ).
+    cargo_manager->load( ).
   ENDMETHOD.
 
 
@@ -167,45 +162,10 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD simple_unload.
-    DATA: gifts_2b_deleted TYPE TABLE OF int4.
-
-    LOOP AT loaded_gifts ASSIGNING FIELD-SYMBOL(<gift>).
-      IF calc_target_city( <gift>->gift ) = last_connection->dest.
-        "we're home, unload and delete from gifts.
-        journal->add_gift_left( <gift>->gift ).
-        loaded_volume -= <gift>->volume.
-        loaded_weight -= <gift>->weight.
-        APPEND <gift>->gift TO gifts_2b_deleted.
-        DELETE loaded_gifts.
-      ENDIF.
-    ENDLOOP.
-    IF sy-subrc = 0.
-      unloading_happened = abap_true.
-    ENDIF.
-
-    LOOP AT gifts_2b_deleted ASSIGNING FIELD-SYMBOL(<gift_2b_del>).
-      DELETE TABLE all_gifts WITH TABLE KEY gift = <gift_2b_del>.
-    ENDLOOP.
-  ENDMETHOD.
 
 
-  METHOD simple_load.
-    IF loaded_volume + 5 >= max_volume OR loaded_weight + 5 >= max_weight.
-      RETURN.
-    ENDIF.
 
-    LOOP AT all_gifts REFERENCE INTO DATA(gift) USING KEY city WHERE location = last_connection->dest.
-      IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
-        APPEND gift TO loaded_gifts.
-        journal->add_gift_picked( gift->gift ).
-        loaded_volume += gift->volume.
-        loaded_weight += gift->weight.
-        loading_happened = abap_true.
-      ENDIF.
-    ENDLOOP.
 
-  ENDMETHOD.
 
 
   METHOD simple_select_city.
