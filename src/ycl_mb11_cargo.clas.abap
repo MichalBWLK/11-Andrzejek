@@ -63,12 +63,12 @@ CLASS ycl_mb11_cargo IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD yif_mb11_cargo~set_location.
+  METHOD set_location.
     current_location = i_location.
   ENDMETHOD.
 
 
-  METHOD yif_mb11_cargo~get_remaining_gifts.
+  METHOD get_remaining_gifts.
     result = me->all_gifts.
   ENDMETHOD.
 

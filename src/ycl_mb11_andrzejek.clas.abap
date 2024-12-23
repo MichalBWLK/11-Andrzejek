@@ -78,6 +78,7 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
       i_scenario = i_scenario
     ).
     DATA(input) = NEW ycl_mb11_input_reader( i_scenario ).
+    all_gifts = input->get_gifts( ).
     all_connections = input->get_connections( ).
     initial_connection = VALUE #( src = 0 dest = 0 time = 0 ).
     last_connection = REF #( initial_connection ).
