@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_TTYP" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD40V>
+    <TYPENAME>YMB112_GIFTS_PER_CITIES</TYPENAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <ROWTYPE>YMB112_GIFTS_PER_CITY</ROWTYPE>
+    <ROWKIND>S</ROWKIND>
+    <DATATYPE>STRU</DATATYPE>
+    <ACCESSMODE>T</ACCESSMODE>
+    <KEYDEF>D</KEYDEF>
+    <KEYKIND>N</KEYKIND>
+    <KEYFDCOUNT>0001</KEYFDCOUNT>
+    <GENERIC>X</GENERIC>
+    <DDTEXT>number of gifts per city</DDTEXT>
+    <FURTHERSECKEY>W</FURTHERSECKEY>
+    <ABAP_LANGUAGE_VERSION>5</ABAP_LANGUAGE_VERSION>
+   </DD40V>
+   <DD42V>
+    <DD42V>
+     <TYPENAME>YMB112_GIFTS_PER_CITIES</TYPENAME>
+     <SECKEYNAME>CITY</SECKEYNAME>
+     <KEYFDPOS>0001</KEYFDPOS>
+     <ROWTYPEPOS>0001</ROWTYPEPOS>
+     <KEYFIELD>CITY</KEYFIELD>
+    </DD42V>
+   </DD42V>
+   <DD43V>
+    <DD43V>
+     <TYPENAME>YMB112_GIFTS_PER_CITIES</TYPENAME>
+     <SECKEYNAME>CITY</SECKEYNAME>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <SECKEYUNIQUE>X</SECKEYUNIQUE>
+     <ACCESSMODE>S</ACCESSMODE>
+     <KIND>K</KIND>
+    </DD43V>
+   </DD43V>
+  </asx:values>
+ </asx:abap>
+</abapGit>

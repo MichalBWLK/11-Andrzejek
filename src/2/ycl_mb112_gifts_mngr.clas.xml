@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>gifts manager</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_A_GIFT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load one gift to the santa&apos;s bag</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_SIMPLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load whichever gifts you have in hands</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>UNLOAD_A_GIFT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>unload one gift from santa&apos;s bag and leave in town</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>UNLOAD_SIMPLE</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>unload gift when it&apos;s in target city</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

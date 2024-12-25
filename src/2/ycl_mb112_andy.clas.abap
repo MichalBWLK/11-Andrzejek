@@ -1,4 +1,4 @@
-CLASS ycl_mb11_andrzejek DEFINITION
+CLASS ycl_mb112_andy DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -16,13 +16,13 @@ CLASS ycl_mb11_andrzejek DEFINITION
         VALUE(r_time) TYPE i.
     METHODS get_journal
       RETURNING VALUE(result) TYPE string.
-    METHODS get_remaining_gifts
-      RETURNING VALUE(result) TYPE ycl_mb11_input_reader=>ty_gifts.
+    METHODS get_qty_of_remaining_gifts
+      RETURNING VALUE(result) TYPE i.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA: cargo_manager TYPE REF TO yif_mb11_cargo,
-          navigator TYPE REF TO yif_mb11_navigator,
+    DATA: gifts TYPE REF TO yif_mb112_gifts_mngr,
+          router TYPE REF TO yif_mb112_router,
           journal TYPE REF TO ycl_mb11_journal.
 
 *    DATA: all_connections TYPE ycl_mb11_input_reader=>ty_connections.
@@ -35,42 +35,35 @@ CLASS ycl_mb11_andrzejek DEFINITION
     METHODS unload.
     METHODS load.
 
-    METHODS calc_target_city
-      IMPORTING
-        i_gift        TYPE int4
-      RETURNING
-        VALUE(result) TYPE ymb11_city.
-
-
-
-
     METHODS make_move.
 
 ENDCLASS.
 
 
 
-CLASS ycl_mb11_andrzejek IMPLEMENTATION.
+CLASS ycl_mb112_andy IMPLEMENTATION.
 
   METHOD constructor.
     journal = new ycl_mb11_journal( ).
-    cargo_manager = new ycl_mb11_cargo_simple(
+    gifts = new ycl_mb112_gifts_group_by_city(
       i_journal  = journal
       i_scenario = i_scenario
     ).
-    navigator = new ycl_mb11_nav_gifts_in_next_c(
+    router = new ycl_mb112_rout_go2_most_gifts(
       i_journal        = journal
       i_scenario       = i_scenario
-      i_path_max_depth = 1
     ).
-    cargo_manager->set_navigator( navigator ).
-    navigator->set_cargo_mngr( cargo_manager ).
+    gifts->set_router( router ).
+    router->set_gifts_manager( gifts ).
   ENDMETHOD.
 
 
   METHOD execute.
     do i_no_of_steps TIMES.
       call_algorithms( ).
+      IF gifts->all_gifts IS INITIAL.
+        EXIT.
+      ENDIF.
     ENDDO.
     journal->persist_journal( i_scenario = i_scenario
                               i_description = i_scenario_descr ).
@@ -83,13 +76,17 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD get_remaining_gifts.
-    result = cargo_manager->get_remaining_gifts( ).
+  METHOD get_qty_of_remaining_gifts.
+    result = gifts->get_qty_of_remaining_gifts( ).
   ENDMETHOD.
 
 
   METHOD call_algorithms.
     unload( ).
+    IF gifts->all_gifts IS INITIAL.
+      journal->save_to_journal( ).
+      RETURN.
+    ENDIF.
     load( ).
     select_city( ).
     make_move( ).
@@ -99,34 +96,31 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
 
 
   METHOD select_city.
-    navigator->set_loaded_gifts( cargo_manager->get_loaded_gifts( ) ).
-    navigator->set_current_time( current_time ).
-    navigator->select_city( ).
+    router->select_next_city( ).
   ENDMETHOD.
 
 
   METHOD unload.
-    cargo_manager->set_location( i_location = navigator->last_connection->dest ).
-    cargo_manager->unload( ).
+    gifts->unload( ).
   ENDMETHOD.
 
 
   METHOD load.
-    cargo_manager->set_location( i_location = navigator->last_connection->dest ).
-    cargo_manager->load( ).
+    gifts->load( ).
   ENDMETHOD.
 
 
   METHOD make_move.
-    IF cargo_manager->loading_happened = abap_true.
+
+    IF gifts->loading_happened = abap_true.
       current_time += 2.
     ENDIF.
-    IF cargo_manager->unloading_happened = abap_true.
+    IF gifts->unloading_happened = abap_true.
       current_time += 2.
     ENDIF.
 
     "calculate waiting time and transfer time:
-    DATA(departure_type) = ( navigator->new_connection->src + navigator->new_connection->dest ) MOD 3.
+    DATA(departure_type) = ( router->next_connection->src + router->next_connection->dest ) MOD 3.
     CASE departure_type.
       WHEN 0.
         DATA(interval) = 2.
@@ -137,16 +131,10 @@ CLASS ycl_mb11_andrzejek IMPLEMENTATION.
     ENDCASE.
     DATA(waiting_time) = interval - ( current_time MOD interval ).
 
-    current_time = current_time + waiting_time + navigator->new_connection->time.
+    current_time = current_time + waiting_time + router->next_connection->time.
 
-    navigator->move_to_next_city( ).
-    cargo_manager->clear_flags( ).
+    router->move_to_next_city( ).
+    gifts->clear_flags( ).
   ENDMETHOD.
-
-
-  METHOD calc_target_city.
-    result = floor( i_gift / 100 ).
-  ENDMETHOD.
-
 
 ENDCLASS.

@@ -22,12 +22,20 @@ CLASS ycl_mb11_run_console IMPLEMENTATION.
 *    populate_connections( ).
 *    populate_gifts( ).
 *    read_gifts( out ).
+*    DATA(andrzejek) = new ycl_mb11_andrzejek( i_scenario = 1 ).
+*    DATA(descr) = CONV ymb11_scenario_description( 'I, 100 k, navi gifts in next city' ).
+*    DATA(time) = andrzejek->execute( i_scenario = 10105 i_scenario_descr = descr i_no_of_steps = 100000 ).
+*    DATA(to_go) = lines( andrzejek->get_remaining_gifts( ) ).
+**    DATA(journal) = andrzejek->get_journal( ).
+*    out->write( descr )->write( `time: ` && time )->write( `left gifts: ` && to_go )."->write( journal ).
 
-    DATA(andrzejek) = new ycl_mb11_andrzejek( i_scenario = 1 ).
-    DATA(time) = andrzejek->execute( i_scenario = 10103 i_scenario_descr = 'pierwszy, 0,1 MLN, refakt. cargo' i_no_of_steps = 100000 ).
-    DATA(to_go) = lines( andrzejek->get_remaining_gifts( ) ).
-*    DATA(journal) = andrzejek->get_journal( ).
-    out->write( `time: ` && time )->write( `left gifts: ` && to_go )."->write( journal ).
+    DATA(andy) = new ycl_mb112_andy( i_scenario = 1 ).
+    DATA(descr) = CONV ymb11_scenario_description( 'I, 700k, Andy: city closest or random' ).
+    DATA(time) = andy->execute( i_scenario = 10111 i_scenario_descr = descr i_no_of_steps = 700000 ).
+    DATA(to_go) = andy->get_qty_of_remaining_gifts( ).
+    DATA(delivered) = 33300 - to_go.
+    out->write( descr )->write( `time: ` && time ).
+    out->write( `delivered ` && delivered && ` out of 33300 ` ).
 
   ENDMETHOD.
 
