@@ -14,6 +14,8 @@ INTERFACE yif_mb112_gifts_mngr
     METHODS set_router
       IMPORTING i_router TYPE REF TO yif_mb112_router.
     METHODS clear_flags.
+    METHODS get_loaded_gifts
+      EXPORTING result TYPE ymb112_gifts.
     METHODS get_qty_of_remaining_gifts
       RETURNING VALUE(result) TYPE i.
 

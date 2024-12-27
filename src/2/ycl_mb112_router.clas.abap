@@ -25,7 +25,8 @@ CLASS ycl_mb112_router DEFINITION
 
   PROTECTED SECTION.
     DATA journal TYPE REF TO ycl_mb11_journal.
-    DATA toolset TYPE REF TO ycl_mb112_gift_city_tools.
+    DATA toolset TYPE REF TO ycl_mb112_toolset.
+    DATA dijkstra TYPE REF TO ycl_mb11_graph_d.
     DATA initial_connection TYPE ymb112_connection.
 
     METHODS select_closest_city.
@@ -48,6 +49,10 @@ CLASS ycl_mb112_router IMPLEMENTATION.
     DATA(input) = NEW ycl_mb11_input_reader( i_scenario ).
     DATA(fetched_connections) = input->get_connections( ).
     MOVE-CORRESPONDING fetched_connections TO all_connections.
+    dijkstra = new #(
+      i_no_of_cities = 999
+      i_connections  = all_connections
+    ).
     initial_connection = VALUE #( src = 0 dest = 0 time = 0 ).
     last_connection = REF #( initial_connection ).
   ENDMETHOD.

@@ -19,6 +19,7 @@ CLASS ycl_mb112_gifts_mngr DEFINITION
       unload FOR yif_mb112_gifts_mngr~unload,
       set_router FOR yif_mb112_gifts_mngr~set_router,
       clear_flags FOR yif_mb112_gifts_mngr~clear_flags,
+      get_loaded_gifts FOR yif_mb112_gifts_mngr~get_loaded_gifts,
       get_qty_of_remaining_gifts FOR yif_mb112_gifts_mngr~get_qty_of_remaining_gifts.
 
     METHODS constructor
@@ -32,7 +33,7 @@ CLASS ycl_mb112_gifts_mngr DEFINITION
     CONSTANTS: co_train TYPE ymb11_city VALUE 9999999.
 
     DATA: journal TYPE REF TO ycl_mb11_journal,
-          toolset TYPE REF TO ycl_mb112_gift_city_tools.
+          toolset TYPE REF TO ycl_mb112_toolset.
 
 
     DATA: loaded_weight TYPE int2,
@@ -83,6 +84,13 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD get_loaded_gifts.
+    SELECT * FROM @all_gifts AS all_gifts
+      WHERE picked = @abap_true
+      INTO TABLE @result.
+  ENDMETHOD.
+
+
   METHOD get_qty_of_remaining_gifts.
     result = lines( all_gifts ).
   ENDMETHOD.
@@ -126,6 +134,7 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
     loading_happened = abap_true.
   ENDMETHOD.
 
+
   METHOD unload_a_gift.
     i_gift->location = router->last_connection->dest.
     i_gift->picked = abap_false.
@@ -138,7 +147,5 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
       DELETE all_gifts  WHERE gift = i_gift->gift.
     ENDIF.
   ENDMETHOD.
-
-
 
 ENDCLASS.

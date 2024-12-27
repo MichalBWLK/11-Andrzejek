@@ -1,4 +1,4 @@
-CLASS ycl_mb112_gift_city_tools DEFINITION
+CLASS ycl_mb112_toolset DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -18,7 +18,7 @@ ENDCLASS.
 
 
 
-CLASS ycl_mb112_gift_city_tools IMPLEMENTATION.
+CLASS ycl_mb112_toolset IMPLEMENTATION.
 
   METHOD calc_target_city.
     result = floor( i_gift / 100 ).
