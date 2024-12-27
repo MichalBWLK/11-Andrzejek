@@ -45,11 +45,11 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
   METHOD constructor.
     journal = new ycl_mb11_journal( ).
-    gifts = new ycl_mb112_gifts_group_by_city(
+    gifts = new ycl_mb112_gifts_simple(
       i_journal  = journal
       i_scenario = i_scenario
     ).
-    router = new ycl_mb112_rout_go2_most_gifts(
+    router = new ycl_mb112_rout_simple(
       i_journal        = journal
       i_scenario       = i_scenario
     ).

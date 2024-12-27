@@ -6,7 +6,9 @@ INTERFACE yif_mb112_router
 
   DATA: gifts_mngr TYPE REF TO yif_mb112_gifts_mngr.
 
-  DATA: current_time TYPE int4.
+  DATA: current_time TYPE int4,
+        targeted_city TYPE ymb11_city READ-ONLY,
+        route TYPE ycl_mb11_graph_d=>ty_steps READ-ONLY.
 
   METHODS select_next_city.
   METHODS set_a_route.

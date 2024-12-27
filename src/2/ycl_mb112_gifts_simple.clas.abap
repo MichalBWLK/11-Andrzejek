@@ -20,6 +20,7 @@ CLASS ycl_mb112_gifts_simple IMPLEMENTATION.
 
   METHOD yif_mb112_gifts_mngr~unload.
     me->unload_simple( ).
+    me->fetch_local_gifts( ).
   ENDMETHOD.
 
 ENDCLASS.

@@ -35,9 +35,15 @@ CLASS ycl_mb112_gifts_mngr DEFINITION
     DATA: journal TYPE REF TO ycl_mb11_journal,
           toolset TYPE REF TO ycl_mb112_toolset.
 
+    DATA: local_gifts TYPE TABLE OF REF TO ymb112_gift.
 
     DATA: loaded_weight TYPE int2,
           loaded_volume TYPE int2.
+
+
+    "! <p class="shorttext synchronized" lang="en">get local gifts for algorithms of loading</p>
+    "! It's needed to be called after each change of city
+    METHODS fetch_local_gifts.
 
     METHODS is_fully_loaded
       RETURNING VALUE(result) TYPE abap_bool.
@@ -57,6 +63,21 @@ CLASS ycl_mb112_gifts_mngr DEFINITION
 
     "! <p class="shorttext synchronized" lang="en">load whichever gifts you have in hands</p>
     METHODS load_simple.
+
+    "! <p class="shorttext synchronized" lang="en">load any gifts but to some level of capacity</p>
+    "!
+    "! @parameter i_max_weight | <p class="shorttext synchronized" lang="en">don't load over this limit</p>
+    "! @parameter i_max_volume | <p class="shorttext synchronized" lang="en">don't load over this limit</p>
+    METHODS load_simple_limited
+      IMPORTING
+        i_max_weight TYPE int2 DEFAULT 95
+        i_max_volume TYPE int2 DEFAULT 140.
+
+    "! <p class="shorttext synchronized" lang="en">load gifts destined for the "targetted city" of the router</p>
+    METHODS load_for_targetted_city.
+
+    "! <p class="shorttext synchronized" lang="en">load gifts for cities which are on the set path/route</p>
+    METHODS load_for_path_cities_frm_1st.
 
   PRIVATE SECTION.
 ENDCLASS.
@@ -103,29 +124,6 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD load_simple.
-    "loop over all un-picked in current location
-    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE location = router->last_connection->dest AND picked = abap_false.
-      IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
-        load_a_gift( gift ).
-      ENDIF.
-      IF is_fully_loaded( ) = abap_true.
-        RETURN.
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
-
-
-  METHOD unload_simple.
-    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE picked = abap_true.
-      IF toolset->calc_target_city( gift->gift ) = router->last_connection->dest.
-        "we're home, unload and delete from gifts (deleting happens automatically, if we unload into the right city
-        unload_a_gift( gift ).
-      ENDIF.
-    ENDLOOP.
-  ENDMETHOD.
-
-
   METHOD load_a_gift.
     i_gift->location = co_train.
     i_gift->picked = abap_true.
@@ -146,6 +144,97 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
       "we're home, time to delete the gift
       DELETE all_gifts  WHERE gift = i_gift->gift.
     ENDIF.
+  ENDMETHOD.
+
+
+  METHOD fetch_local_gifts.
+    clear local_gifts.
+    LOOP AT all_gifts REFERENCE INTO DATA(gift) USING KEY local_gifts WHERE location = router->last_connection->dest AND picked = abap_false.
+      APPEND gift to local_gifts.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_simple.
+    LOOP AT local_gifts INTO DATA(gift).
+      IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
+        load_a_gift( gift ).
+        DELETE local_gifts.
+      ENDIF.
+      IF is_fully_loaded( ) = abap_true.
+        RETURN.
+      ENDIF.
+    ENDLOOP.
+
+    "loop over all un-picked in current location
+*    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE location = router->last_connection->dest AND picked = abap_false.
+*      IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
+*        load_a_gift( gift ).
+*      ENDIF.
+*      IF is_fully_loaded( ) = abap_true.
+*        RETURN.
+*      ENDIF.
+*    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD unload_simple.
+    LOOP AT all_gifts REFERENCE INTO DATA(gift) USING KEY local_gifts WHERE picked = abap_true.
+      IF toolset->calc_target_city( gift->gift ) = router->last_connection->dest.
+        "we're home, unload and delete from gifts (deleting happens automatically, if we unload into the right city
+        unload_a_gift( gift ).
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_simple_limited.
+    IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
+      RETURN.
+    ENDIF.
+    LOOP AT local_gifts INTO DATA(gift).
+      IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
+        load_a_gift( gift ).
+        DELETE local_gifts.
+      ENDIF.
+      IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
+        RETURN.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_for_targetted_city.
+    LOOP AT local_gifts INTO data(gift).
+*    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE location = router->last_connection->dest AND picked = abap_false.
+      IF toolset->calc_target_city( gift->gift ) = router->targeted_city.
+        IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
+          load_a_gift( gift ).
+          DELETE local_gifts.
+        ENDIF.
+        IF is_fully_loaded( ) = abap_true.
+          RETURN.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_for_path_cities_frm_1st.
+    LOOP AT router->route ASSIGNING field-symbol(<step>).
+      LOOP AT local_gifts INTO data(gift).
+*      LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE location = router->last_connection->dest AND picked = abap_false.
+        IF toolset->calc_target_city( gift->gift ) = <step>-to.
+          IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
+            load_a_gift( gift ).
+            DELETE local_gifts.
+          ENDIF.
+          IF is_fully_loaded( ) = abap_true.
+            RETURN.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.

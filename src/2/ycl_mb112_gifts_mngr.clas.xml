@@ -14,15 +14,39 @@
    <DESCRIPTIONS>
     <SEOCOMPOTX>
      <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>FETCH_LOCAL_GIFTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>get local gifts for algorithms of loading</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
      <CMPNAME>LOAD_A_GIFT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load one gift to the santa&apos;s bag</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_FOR_PATH_CITIES_FRM_1ST</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load gifts for cities which are on the set path/route</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_FOR_TARGETTED_CITY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load gifts destined for the &quot;targetted city&quot; of the router</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
      <CMPNAME>LOAD_SIMPLE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load whichever gifts you have in hands</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_SIMPLE_LIMITED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load any gifts but to some level of capacity</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
@@ -37,6 +61,20 @@
      <DESCRIPT>unload gift when it&apos;s in target city</DESCRIPT>
     </SEOCOMPOTX>
    </DESCRIPTIONS>
+   <DESCRIPTIONS_SUB>
+    <SEOSUBCOTX>
+     <CMPNAME>LOAD_SIMPLE_LIMITED</CMPNAME>
+     <SCONAME>I_MAX_VOLUME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>don&apos;t load over this limit</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>LOAD_SIMPLE_LIMITED</CMPNAME>
+     <SCONAME>I_MAX_WEIGHT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>don&apos;t load over this limit</DESCRIPT>
+    </SEOSUBCOTX>
+   </DESCRIPTIONS_SUB>
   </asx:values>
  </asx:abap>
 </abapGit>

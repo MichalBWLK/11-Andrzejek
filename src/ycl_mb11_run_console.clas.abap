@@ -30,8 +30,8 @@ CLASS ycl_mb11_run_console IMPLEMENTATION.
 *    out->write( descr )->write( `time: ` && time )->write( `left gifts: ` && to_go )."->write( journal ).
 
     DATA(andy) = new ycl_mb112_andy( i_scenario = 1 ).
-    DATA(descr) = CONV ymb11_scenario_description( 'I,1M Andy; C:routeByGift; G:simple' ).
-    DATA(time) = andy->execute( i_scenario = 10114 i_scenario_descr = descr i_no_of_steps = 1000000 ).
+    DATA(descr) = CONV ymb11_scenario_description( 'I,10k Andy; dummy' ).
+    DATA(time) = andy->execute( i_scenario = 10100 i_scenario_descr = descr i_no_of_steps = 10000 ).
     DATA(to_go) = andy->get_qty_of_remaining_gifts( ).
     DATA(delivered) = 33300 - to_go.
     out->write( descr )->write( `time: ` && time ).

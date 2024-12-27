@@ -16,7 +16,10 @@ CLASS ycl_mb112_router DEFINITION
       select_next_city FOR yif_mb112_router~select_next_city,
       set_a_route FOR yif_mb112_router~set_a_route,
       move_to_next_city FOR yif_mb112_router~move_to_next_city,
-      set_gifts_manager FOR yif_mb112_router~set_gifts_manager.
+      set_gifts_manager FOR yif_mb112_router~set_gifts_manager,
+      targeted_city FOR yif_mb112_router~targeted_city,
+      route FOR yif_mb112_router~route.
+
 
     METHODS constructor
       IMPORTING
@@ -28,6 +31,7 @@ CLASS ycl_mb112_router DEFINITION
     DATA toolset TYPE REF TO ycl_mb112_toolset.
     DATA dijkstra TYPE REF TO ycl_mb11_graph_d.
     DATA initial_connection TYPE ymb112_connection.
+
 
     METHODS select_closest_city.
     METHODS select_random_city.
