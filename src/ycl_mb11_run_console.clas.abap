@@ -9,9 +9,7 @@ CLASS ycl_mb11_run_console DEFINITION
   PRIVATE SECTION.
 
 
-    METHODS read_gifts
-      IMPORTING
-        i_out TYPE REF TO if_oo_adt_classrun_out.
+
 ENDCLASS.
 
 
@@ -45,36 +43,6 @@ CLASS ycl_mb11_run_console IMPLEMENTATION.
 
 
 
-  METHOD read_gifts.
-    DATA: gifts     TYPE SORTED TABLE OF ymb11gifts WITH UNIQUE KEY gift,
-          reference TYPE REF TO data.
 
-    TRY.
-        SELECT SINGLE
-          FROM yr_mb11files
-          FIELDS Attachment
-          WHERE FilePurpose = 'GFT'
-          INTO @DATA(file)
-        .
-        DATA(content) = cl_abap_conv_codepage=>create_in( )->convert( file ).
-        DATA(parser) = NEW ycl_mb_csv_parser(
-          i_target_structure = 'YMB11GIFTS'
-*         i_line_separator   = CL_ABAP_CHAR_UTILITIES=>CR_LF
-*         i_value_separator  = ';'
-          i_value_delimiter  = ''
-*         i_remove_header    = abap_true
-        ).
-
-        reference = parser->convert_csv2tab( content ).
-        gifts = reference->*.
-
-
-        i_out->write( gifts[ 5 ] ).
-        i_out->write( 'finito' ).
-      CATCH cx_sy_conversion_codepage cx_parameter_invalid_range INTO DATA(exception).
-        i_out->write( exception->get_text( ) ).
-    ENDTRY.
-
-  ENDMETHOD.
 
 ENDCLASS.
