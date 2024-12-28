@@ -45,11 +45,11 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
   METHOD constructor.
     journal = new ycl_mb11_journal( ).
-    gifts = new ycl_mb112_gifts_simple(
+    gifts = new ycl_mb112_gifts_group_by_city(
       i_journal  = journal
       i_scenario = i_scenario
     ).
-    router = new ycl_mb112_rout_simple(
+    router = new ycl_mb112_rout_go2_most_gifts(
       i_journal        = journal
       i_scenario       = i_scenario
     ).
@@ -66,7 +66,8 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
       ENDIF.
     ENDDO.
     journal->persist_journal( i_scenario = i_scenario
-                              i_description = i_scenario_descr ).
+                              i_description = i_scenario_descr
+                              i_time = current_time ).
     r_time = current_time.
   ENDMETHOD.
 
@@ -83,14 +84,15 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
   METHOD call_algorithms.
     unload( ).
+    load( ).
+    select_city( ).
+
     IF gifts->all_gifts IS INITIAL.
       journal->save_to_journal( ).
       RETURN.
     ENDIF.
-    load( ).
-    select_city( ).
-    make_move( ).
 
+    make_move( ).
     journal->save_to_journal( ).
   ENDMETHOD.
 

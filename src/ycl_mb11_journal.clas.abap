@@ -16,7 +16,8 @@ CLASS ycl_mb11_journal DEFINITION
     METHODS persist_journal
       IMPORTING
         i_scenario TYPE int2
-        i_description TYPE ymb11_scenario_description.
+        i_description TYPE ymb11_scenario_description
+        i_time TYPE int4 OPTIONAL.
 
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -85,9 +86,10 @@ CLASS ycl_mb11_journal IMPLEMENTATION.
       scenario             = i_scenario
       file_purpose         = 'RES'
       scenario_description = i_description
+      time                 = i_time
       attachment           = attachment
       mimetype             = 'text/csv'
-      filename             = 'solution.csv'
+      filename             = |output_steps_Vault_Boy{ i_scenario }.csv|
       createdby            = cl_abap_context_info=>get_user_technical_name( )
       createdat            = timestamp
       lastchangedby        = cl_abap_context_info=>get_user_technical_name( )
@@ -101,9 +103,10 @@ CLASS ycl_mb11_journal IMPLEMENTATION.
       INTO @solution.
     IF sy-subrc = 0.
       solution-scenario_description = i_description.
-      solution-attachment = attachment.
-      solution-lastchangedby = cl_abap_context_info=>get_user_technical_name( ).
-      solution-lastchangedat = timestamp.
+      solution-time           = i_time.
+      solution-attachment     = attachment.
+      solution-lastchangedby  = cl_abap_context_info=>get_user_technical_name( ).
+      solution-lastchangedat  = timestamp.
       UPDATE ymb11files FROM @solution.
     ELSE.
       INSERT ymb11files FROM @solution.

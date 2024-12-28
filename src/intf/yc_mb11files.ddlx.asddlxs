@@ -28,6 +28,11 @@ annotate view YC_MB11FILES with
   @UI.selectionField: [ {position: 30 } ]
   ScenarioDescription;
   
+  @UI.identification: [ {position: 35,label: 'time' } ]
+  @UI.lineItem: [ {position: 35,label: 'time'} ]
+  @UI.selectionField: [ {position: 35 } ]
+  Time;
+  
   @UI.identification: [ {position: 40,label: 'attachment'} ]
   @UI.lineItem: [ {position: 40,label: 'attachment' } ]
   @UI.fieldGroup: [{ qualifier: 'the_file', label: 'attachment' }]

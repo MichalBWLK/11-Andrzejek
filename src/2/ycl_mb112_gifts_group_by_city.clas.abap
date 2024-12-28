@@ -10,6 +10,8 @@ CLASS ycl_mb112_gifts_group_by_city DEFINITION
   PRIVATE SECTION.
 
 
+
+
 ENDCLASS.
 
 
@@ -21,20 +23,25 @@ CLASS ycl_mb112_gifts_group_by_city IMPLEMENTATION.
       load_for_targetted_city( ).
       load_for_path_cities_frm_1st( ).
     ENDIF.
+    load_for_already_loaded( ).
+    load_most_for_one_limited(
+      i_max_weight = 190
+      i_max_volume = 280
+    ).
     load_simple_limited(
-      i_max_weight = 110
-      i_max_volume = 160
+      i_max_weight = 172
+      i_max_volume = 256
     ).
 
   ENDMETHOD.
 
   METHOD yif_mb112_gifts_mngr~unload.
     me->unload_simple( ).
+    IF unloading_happened = abap_true.
+      me->unload_all( ).
+    ENDIF.
     me->fetch_local_gifts( ).
   ENDMETHOD.
-
-
-
 
 
 

@@ -9,6 +9,7 @@ define root view entity YC_MB11FILES
   key Scenario,
   key FilePurpose,
   ScenarioDescription,
+  Time,
   Attachment,
   Mimetype,
   Filename,

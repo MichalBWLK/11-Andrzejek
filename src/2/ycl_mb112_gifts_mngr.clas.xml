@@ -26,6 +26,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_FOR_ALREADY_LOADED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load gifts for cities, for which gifts are already picked</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
      <CMPNAME>LOAD_FOR_PATH_CITIES_FRM_1ST</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load gifts for cities which are on the set path/route</DESCRIPT>
@@ -35,6 +41,12 @@
      <CMPNAME>LOAD_FOR_TARGETTED_CITY</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load gifts destined for the &quot;targetted city&quot; of the router</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CMPNAME>LOAD_MOST_FOR_ONE_LIMITED</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load for cities, who have most gifts available for one city</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
@@ -63,16 +75,28 @@
    </DESCRIPTIONS>
    <DESCRIPTIONS_SUB>
     <SEOSUBCOTX>
+     <CMPNAME>LOAD_MOST_FOR_ONE_LIMITED</CMPNAME>
+     <SCONAME>I_MAX_VOLUME</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>don&apos;t load above this limit</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
+     <CMPNAME>LOAD_MOST_FOR_ONE_LIMITED</CMPNAME>
+     <SCONAME>I_MAX_WEIGHT</SCONAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>don&apos;t load above this limit</DESCRIPT>
+    </SEOSUBCOTX>
+    <SEOSUBCOTX>
      <CMPNAME>LOAD_SIMPLE_LIMITED</CMPNAME>
      <SCONAME>I_MAX_VOLUME</SCONAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>don&apos;t load over this limit</DESCRIPT>
+     <DESCRIPT>don&apos;t load above this limit</DESCRIPT>
     </SEOSUBCOTX>
     <SEOSUBCOTX>
      <CMPNAME>LOAD_SIMPLE_LIMITED</CMPNAME>
      <SCONAME>I_MAX_WEIGHT</SCONAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>don&apos;t load over this limit</DESCRIPT>
+     <DESCRIPT>don&apos;t load above this limit</DESCRIPT>
     </SEOSUBCOTX>
    </DESCRIPTIONS_SUB>
   </asx:values>

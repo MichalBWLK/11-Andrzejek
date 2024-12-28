@@ -7,6 +7,7 @@ define root view entity YR_MB11FILES
   key scenario as Scenario,
   key file_purpose as FilePurpose,
   scenario_description as ScenarioDescription,
+  time as Time,
   @Semantics.largeObject: {
     mimeType:'Mimetype',
     fileName: 'Filename',

@@ -39,6 +39,7 @@ authorization master( global )
     Scenario = scenario;
     FilePurpose = file_purpose;
     ScenarioDescription = scenario_description;
+    Time = time;
     Attachment = attachment;
     Mimetype = mimetype;
     Filename = filename;

@@ -61,13 +61,15 @@ CLASS ycl_mb112_gifts_mngr DEFINITION
     "! <p class="shorttext synchronized" lang="en">unload gift when it's in target city</p>
     METHODS unload_simple.
 
+    METHODS unload_all.
+
     "! <p class="shorttext synchronized" lang="en">load whichever gifts you have in hands</p>
     METHODS load_simple.
 
     "! <p class="shorttext synchronized" lang="en">load any gifts but to some level of capacity</p>
     "!
-    "! @parameter i_max_weight | <p class="shorttext synchronized" lang="en">don't load over this limit</p>
-    "! @parameter i_max_volume | <p class="shorttext synchronized" lang="en">don't load over this limit</p>
+    "! @parameter i_max_weight | <p class="shorttext synchronized" lang="en">don't load above this limit</p>
+    "! @parameter i_max_volume | <p class="shorttext synchronized" lang="en">don't load above this limit</p>
     METHODS load_simple_limited
       IMPORTING
         i_max_weight TYPE int2 DEFAULT 95
@@ -78,6 +80,18 @@ CLASS ycl_mb112_gifts_mngr DEFINITION
 
     "! <p class="shorttext synchronized" lang="en">load gifts for cities which are on the set path/route</p>
     METHODS load_for_path_cities_frm_1st.
+
+    "! <p class="shorttext synchronized" lang="en">load gifts for cities, for which gifts are already picked</p>
+    METHODS load_for_already_loaded.
+
+    "! <p class="shorttext synchronized" lang="en">load for cities, who have most gifts available for one city</p>
+    "!
+    "! @parameter i_max_weight | <p class="shorttext synchronized" lang="en">don't load above this limit</p>
+    "! @parameter i_max_volume | <p class="shorttext synchronized" lang="en">don't load above this limit</p>
+    METHODS load_most_for_one_limited
+      IMPORTING
+        i_max_weight TYPE int2
+        i_max_volume TYPE int2.
 
   PRIVATE SECTION.
 ENDCLASS.
@@ -118,7 +132,8 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
 
 
   METHOD is_fully_loaded.
-    IF loaded_volume + 5 >= max_volume OR loaded_weight + 5 >= max_weight.
+  CONSTANTS: co_max_margin TYPE int2 VALUE 2. "a lot of gifts are bigger than 2, so if only 2 is left, there's no point of trying to fit another gift
+    IF loaded_volume + co_max_margin >= max_volume OR loaded_weight + co_max_margin >= max_weight.
       result = abap_true.
     ENDIF.
   ENDMETHOD.
@@ -127,6 +142,7 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
   METHOD load_a_gift.
     i_gift->location = co_train.
     i_gift->picked = abap_true.
+    journal->add_gift_picked( gift = i_gift->gift ).
     loaded_volume += i_gift->volume.
     loaded_weight += i_gift->weight.
     loading_happened = abap_true.
@@ -155,6 +171,23 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD unload_simple.
+    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE picked = abap_true.
+      IF toolset->calc_target_city( gift->gift ) = router->last_connection->dest.
+        "we're home, unload and delete from gifts (deleting happens automatically, if we unload into the right city
+        unload_a_gift( gift ).
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD unload_all.
+    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE picked = abap_true.
+      unload_a_gift( gift ).
+    ENDLOOP.
+  ENDMETHOD.
+
+
   METHOD load_simple.
     LOOP AT local_gifts INTO DATA(gift).
       IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
@@ -175,16 +208,6 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
 *        RETURN.
 *      ENDIF.
 *    ENDLOOP.
-  ENDMETHOD.
-
-
-  METHOD unload_simple.
-    LOOP AT all_gifts REFERENCE INTO DATA(gift) USING KEY local_gifts WHERE picked = abap_true.
-      IF toolset->calc_target_city( gift->gift ) = router->last_connection->dest.
-        "we're home, unload and delete from gifts (deleting happens automatically, if we unload into the right city
-        unload_a_gift( gift ).
-      ENDIF.
-    ENDLOOP.
   ENDMETHOD.
 
 
@@ -235,6 +258,66 @@ CLASS ycl_mb112_gifts_mngr IMPLEMENTATION.
         ENDIF.
       ENDLOOP.
     ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_for_already_loaded.
+    DATA loaded_gifts TYPE ymb112_gifts.
+
+    IF is_fully_loaded( ) = abap_true.
+      RETURN.
+    ENDIF.
+
+    SELECT * FROM @all_gifts AS gifts
+      WHERE picked = @abap_true
+      INTO TABLE @loaded_gifts
+    .
+    data(cities) = toolset->get_cities_wth_most_gifts( loaded_gifts ).
+
+    LOOP AT cities ASSIGNING field-symbol(<city>).
+      LOOP AT local_gifts ASSIGNING field-symbol(<gift>).
+        IF <city>-city = toolset->calc_target_city( <gift>->gift ).
+          IF <gift>->weight <= max_weight - loaded_weight AND <gift>->volume <= max_volume - loaded_volume.
+            load_a_gift( <gift> ).
+            DELETE local_gifts.
+          ENDIF.
+          IF is_fully_loaded( ) = abap_true.
+            RETURN.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_most_for_one_limited.
+    DATA gifts_for_loading TYPE ymb112_gifts.
+
+    IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
+      RETURN.
+    ENDIF.
+
+    SELECT * FROM @all_gifts AS gifts
+      WHERE picked = @abap_false
+        AND location = @router->last_connection->dest
+      INTO TABLE @gifts_for_loading.
+    .
+    data(cities) = toolset->get_cities_wth_most_gifts( gifts_for_loading ).
+
+    LOOP AT cities ASSIGNING field-symbol(<city>).
+      LOOP AT local_gifts ASSIGNING field-symbol(<gift>).
+        IF <city>-city = toolset->calc_target_city( <gift>->gift ).
+          IF <gift>->weight <= max_weight - loaded_weight AND <gift>->volume <= max_volume - loaded_volume.
+            load_a_gift( <gift> ).
+            DELETE local_gifts.
+          ENDIF.
+          IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
+            RETURN.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+    ENDLOOP.
+
   ENDMETHOD.
 
 ENDCLASS.
