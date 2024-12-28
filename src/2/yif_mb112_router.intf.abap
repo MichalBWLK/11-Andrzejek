@@ -11,7 +11,6 @@ INTERFACE yif_mb112_router
         route TYPE ycl_mb11_graph_d=>ty_steps READ-ONLY.
 
   METHODS select_next_city.
-  METHODS set_a_route.
   METHODS move_to_next_city.
   METHODS set_gifts_manager
     IMPORTING i_mngr TYPE REF TO yif_mb112_gifts_mngr.

@@ -5,8 +5,8 @@ CLASS ycl_mb11_input_reader DEFINITION
 
   PUBLIC SECTION.
 
-    TYPES ty_gifts TYPE STANDARD TABLE OF ymb11gifts WITH EMPTY KEY WITH UNIQUE SORTED KEY gifts COMPONENTS gift WITH NON-UNIQUE SORTED KEY city COMPONENTS location .
-    TYPES ty_connections TYPE STANDARD TABLE OF ymb11connections WITH EMPTY KEY WITH UNIQUE SORTED KEY conn COMPONENTS src dest." WITH EMPTY KEY WITH NON-UNIQUE SORTED KEY source COMPONENTS src.
+    TYPES ty_gifts TYPE STANDARD TABLE OF YMB112_GIFT WITH EMPTY KEY WITH UNIQUE SORTED KEY gifts COMPONENTS gift WITH NON-UNIQUE SORTED KEY city COMPONENTS location .
+    TYPES ty_connections TYPE STANDARD TABLE OF YMB112_CONNECTION WITH EMPTY KEY WITH UNIQUE SORTED KEY conn COMPONENTS src dest." WITH EMPTY KEY WITH NON-UNIQUE SORTED KEY source COMPONENTS src.
 
     METHODS constructor
       IMPORTING i_scenario TYPE int2.
@@ -69,7 +69,7 @@ CLASS ycl_mb11_input_reader IMPLEMENTATION.
     .
     DATA(content) = cl_abap_conv_codepage=>create_in( )->convert( file ).
     DATA(parser) = NEW ycl_mb_csv_parser(
-      i_target_structure = 'YMB11GIFTS'
+      i_target_structure = 'YMB112_GIFT'
       i_value_delimiter  = ''
     ).
     me->gifts = parser->convert_csv2tab( content ).
@@ -85,7 +85,7 @@ CLASS ycl_mb11_input_reader IMPLEMENTATION.
     .
     DATA(content) = cl_abap_conv_codepage=>create_in( )->convert( file ).
     DATA(parser) = NEW ycl_mb_csv_parser(
-      i_target_structure = 'YMB11CONNECTIONS'
+      i_target_structure = 'YMB112_CONNECTION'
       i_value_delimiter  = ''
     ).
     me->connections = parser->convert_csv2tab( content ).

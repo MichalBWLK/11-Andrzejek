@@ -12,9 +12,7 @@ CLASS ycl_mb112_router DEFINITION
       current_time FOR yif_mb112_router~current_time.
     ALIASES:
       gifts_mngr FOR yif_mb112_router~gifts_mngr.
-    ALIASES:
-      select_next_city FOR yif_mb112_router~select_next_city,
-      set_a_route FOR yif_mb112_router~set_a_route,
+    ALIASES: select_next_city FOR yif_mb112_router~select_next_city,
       move_to_next_city FOR yif_mb112_router~move_to_next_city,
       set_gifts_manager FOR yif_mb112_router~set_gifts_manager,
       targeted_city FOR yif_mb112_router~targeted_city,
@@ -35,6 +33,8 @@ CLASS ycl_mb112_router DEFINITION
 
     METHODS select_closest_city.
     METHODS select_random_city.
+    METHODS follow_path.
+    METHODS set_city_path_by_most_gifts.
 
 PRIVATE SECTION.
     METHODS generate_seed
@@ -65,11 +65,6 @@ CLASS ycl_mb112_router IMPLEMENTATION.
   METHOD move_to_next_city.
     last_connection = next_connection.
     clear: next_connection.
-  ENDMETHOD.
-
-
-  METHOD set_a_route.
-##TODO
   ENDMETHOD.
 
 
@@ -122,6 +117,37 @@ CLASS ycl_mb112_router IMPLEMENTATION.
 
     SPLIT stamp AT '.' INTO trash seed .
     result = seed / 10.
+  ENDMETHOD.
+
+
+  METHOD follow_path.
+    READ TABLE route WITH KEY from = last_connection->dest ASSIGNING field-symbol(<step>).
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE ycx_mb12_path_fail.
+    ENDIF.
+    READ TABLE all_connections WITH TABLE KEY binding COMPONENTS src = <step>-from
+                                                                 dest = <step>-to
+                               REFERENCE INTO next_connection.
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE ycx_mb12_path_fail.
+    ENDIF.
+
+    IF next_connection->dest = targeted_city.
+      CLEAR: targeted_city, route.
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD set_city_path_by_most_gifts.
+    gifts_mngr->get_loaded_gifts( IMPORTING result = data(loaded_gifts) ).
+    targeted_city = toolset->get_city_wth_most_gifts( loaded_gifts ).
+    IF targeted_city = toolset->co_city_not_existing.
+      RAISE EXCEPTION TYPE ycx_mb12_path_fail.
+    ENDIF.
+    route = dijkstra->find_shortest_path(
+              i_from = last_connection->dest
+              i_to   = targeted_city
+            ).
   ENDMETHOD.
 
 ENDCLASS.
