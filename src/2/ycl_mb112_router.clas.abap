@@ -1,10 +1,9 @@
 CLASS ycl_mb112_router DEFINITION
   PUBLIC
-  ABSTRACT
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES yif_mb112_router ABSTRACT METHODS select_next_city.
+    INTERFACES yif_mb112_router.
     ALIASES:
       all_connections FOR yif_mb112_router~all_connections,
       last_connection FOR yif_mb112_router~last_connection,
@@ -12,7 +11,7 @@ CLASS ycl_mb112_router DEFINITION
       current_time FOR yif_mb112_router~current_time.
     ALIASES:
       gifts_mngr FOR yif_mb112_router~gifts_mngr.
-    ALIASES: select_next_city FOR yif_mb112_router~select_next_city,
+    ALIASES:
       move_to_next_city FOR yif_mb112_router~move_to_next_city,
       set_gifts_manager FOR yif_mb112_router~set_gifts_manager,
       targeted_city FOR yif_mb112_router~targeted_city,
@@ -24,17 +23,16 @@ CLASS ycl_mb112_router DEFINITION
         i_journal  TYPE REF TO ycl_mb11_journal
         i_scenario TYPE int2.
 
+    METHODS select_closest_city.
+    METHODS select_random_city.
+    METHODS follow_path.
+    METHODS set_city_path_by_most_gifts.
+
   PROTECTED SECTION.
     DATA journal TYPE REF TO ycl_mb11_journal.
     DATA toolset TYPE REF TO ycl_mb112_toolset.
     DATA dijkstra TYPE REF TO ycl_mb11_graph_d.
     DATA initial_connection TYPE ymb112_connection.
-
-
-    METHODS select_closest_city.
-    METHODS select_random_city.
-    METHODS follow_path.
-    METHODS set_city_path_by_most_gifts.
 
 PRIVATE SECTION.
     METHODS generate_seed

@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+    <CLSNAME>YCL_MB112_CARGO</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>gifts manager</DESCRIPT>
     <STATE>1</STATE>
@@ -13,61 +13,61 @@
    </VSEOCLASS>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>FETCH_LOCAL_GIFTS</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>get local gifts for algorithms of loading</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_A_GIFT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load one gift to the santa&apos;s bag</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_FOR_ALREADY_LOADED</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load gifts for cities, for which gifts are already picked</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_FOR_PATH_CITIES_FRM_1ST</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load gifts for cities which are on the set path/route</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_FOR_TARGETTED_CITY</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load gifts destined for the &quot;targetted city&quot; of the router</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_MOST_FOR_ONE_LIMITED</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load for cities, who have most gifts available for one city</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_SIMPLE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load whichever gifts you have in hands</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_SIMPLE_LIMITED</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load any gifts but to some level of capacity</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>UNLOAD_A_GIFT</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>unload one gift from santa&apos;s bag and leave in town</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>YCL_MB112_GIFTS_MNGR</CLSNAME>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>UNLOAD_SIMPLE</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>unload gift when it&apos;s in target city</DESCRIPT>

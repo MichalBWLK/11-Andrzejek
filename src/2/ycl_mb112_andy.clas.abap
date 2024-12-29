@@ -21,8 +21,8 @@ CLASS ycl_mb112_andy DEFINITION
 
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA: gifts TYPE REF TO yif_mb112_gifts_mngr,
-          router TYPE REF TO yif_mb112_router,
+    DATA: gifts TYPE REF TO ycl_mb112_cargo,
+          router TYPE REF TO ycl_mb112_router,
           journal TYPE REF TO ycl_mb11_journal.
 
 *    DATA: all_connections TYPE ycl_mb11_input_reader=>ty_connections.
@@ -31,10 +31,6 @@ CLASS ycl_mb112_andy DEFINITION
 
 
     METHODS call_algorithms.
-    METHODS select_city.
-    METHODS unload.
-    METHODS load.
-
     METHODS make_move.
 
 ENDCLASS.
@@ -45,11 +41,11 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
   METHOD constructor.
     journal = new ycl_mb11_journal( ).
-    gifts = new ycl_mb112_gifts_group_by_city(
+    gifts = new #(
       i_journal  = journal
       i_scenario = i_scenario
     ).
-    router = new ycl_mb112_rout_go2_most_gifts(
+    router = new ycl_mb112_router(
       i_journal        = journal
       i_scenario       = i_scenario
     ).
@@ -83,9 +79,45 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
 
   METHOD call_algorithms.
-    unload( ).
-    load( ).
-    select_city( ).
+
+    "unload
+     gifts->unload_simple( ).
+    IF gifts->unloading_happened = abap_true.
+      gifts->unload_all( ).
+    ENDIF.
+
+    "load
+    IF router->targeted_city IS NOT INITIAL.
+      gifts->load_for_targetted_city( ).
+      gifts->load_for_path_cities_frm_1st( ).
+    ENDIF.
+    gifts->load_for_already_loaded( ).
+    gifts->load_most_for_one_limited(
+      i_max_weight = 190
+      i_max_volume = 280
+    ).
+    gifts->load_simple_limited(
+      i_max_weight = 172
+      i_max_volume = 256
+    ).
+
+    "select next destination city
+     TRY.
+        IF router->targeted_city IS NOT INITIAL.
+          router->follow_path( ).
+        ELSE.
+          router->set_city_path_by_most_gifts( ).
+          router->follow_path( ).
+        ENDIF.
+      CATCH ycx_mb12_path_fail.
+        IF sy-index MOD 3 = 0.
+          router->select_random_city( ).
+        ELSE.
+          router->select_closest_city( ).
+        ENDIF.
+    ENDTRY.
+    journal->set_next_city( router->next_connection->dest ).
+
 
     IF gifts->all_gifts IS INITIAL.
       journal->save_to_journal( ).
@@ -94,21 +126,6 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
     make_move( ).
     journal->save_to_journal( ).
-  ENDMETHOD.
-
-
-  METHOD select_city.
-    router->select_next_city( ).
-  ENDMETHOD.
-
-
-  METHOD unload.
-    gifts->unload( ).
-  ENDMETHOD.
-
-
-  METHOD load.
-    gifts->load( ).
   ENDMETHOD.
 
 
