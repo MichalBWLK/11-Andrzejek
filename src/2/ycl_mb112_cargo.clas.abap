@@ -7,7 +7,7 @@ CLASS ycl_mb112_cargo DEFINITION
     DATA: all_gifts         TYPE ymb112_gifts READ-ONLY,
           packed_for_cities TYPE ymb112_gifts_per_cities READ-ONLY.
 
-    DATA: router TYPE REF TO yif_mb112_router.
+    DATA: router TYPE REF TO ycl_mb112_navigator.
 
     DATA: unloading_happened TYPE abap_bool READ-ONLY,
           loading_happened   TYPE abap_bool READ-ONLY.
@@ -24,7 +24,7 @@ CLASS ycl_mb112_cargo DEFINITION
 
 
     METHODS set_router
-      IMPORTING i_router TYPE REF TO yif_mb112_router.
+      IMPORTING i_router TYPE REF TO ycl_mb112_navigator.
     METHODS clear_flags.
     METHODS get_loaded_gifts
       EXPORTING result TYPE ymb112_gifts.

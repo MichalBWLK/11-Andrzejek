@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>YCL_MB112_ANDY</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>the carrier</DESCRIPT>
+    <DESCRIPT>the carrier: unload all, load for targetted city, route by p</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>YCL_MB112_ROUT_GO2_MOST_GIFTS</CLSNAME>
+    <CLSNAME>YCL_MB112_NAVIGATOR</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>choose city, for which there are most gifts packed (set path</DESCRIPT>
+    <DESCRIPT>navigator - sets next cities</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

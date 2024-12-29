@@ -1,27 +1,28 @@
-CLASS ycl_mb112_router DEFINITION
+CLASS ycl_mb112_navigator DEFINITION
   PUBLIC
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES yif_mb112_router.
-    ALIASES:
-      all_connections FOR yif_mb112_router~all_connections,
-      last_connection FOR yif_mb112_router~last_connection,
-      next_connection FOR yif_mb112_router~next_connection,
-      current_time FOR yif_mb112_router~current_time.
-    ALIASES:
-      gifts_mngr FOR yif_mb112_router~gifts_mngr.
-    ALIASES:
-      move_to_next_city FOR yif_mb112_router~move_to_next_city,
-      set_gifts_manager FOR yif_mb112_router~set_gifts_manager,
-      targeted_city FOR yif_mb112_router~targeted_city,
-      route FOR yif_mb112_router~route.
+
+    DATA: all_connections TYPE ymb112_connections,
+          last_connection TYPE REF TO ymb112_connection,
+          next_connection TYPE REF TO ymb112_connection.
+
+    DATA: gifts_mngr TYPE REF TO ycl_mb112_cargo.
+
+    DATA: current_time  TYPE int4,
+          targeted_city TYPE ymb11_city READ-ONLY,
+          route         TYPE ycl_mb11_graph_d=>ty_steps READ-ONLY.
 
 
     METHODS constructor
       IMPORTING
         i_journal  TYPE REF TO ycl_mb11_journal
         i_scenario TYPE int2.
+
+    METHODS set_gifts_manager
+      IMPORTING i_mngr TYPE REF TO ycl_mb112_cargo.
+    METHODS move_to_next_city.
 
     METHODS select_closest_city.
     METHODS select_random_city.
@@ -34,24 +35,22 @@ CLASS ycl_mb112_router DEFINITION
     DATA dijkstra TYPE REF TO ycl_mb11_graph_d.
     DATA initial_connection TYPE ymb112_connection.
 
-PRIVATE SECTION.
+  PRIVATE SECTION.
     METHODS generate_seed
       RETURNING
-        value(result) TYPE i.
-
+        VALUE(result) TYPE i.
 ENDCLASS.
 
 
 
-CLASS ycl_mb112_router IMPLEMENTATION.
-
+CLASS ycl_mb112_navigator IMPLEMENTATION.
   METHOD constructor.
-    toolset = new #( ).
+    toolset = NEW #( ).
     journal = i_journal.
     DATA(input) = NEW ycl_mb11_input_reader( i_scenario ).
     DATA(fetched_connections) = input->get_connections( ).
     MOVE-CORRESPONDING fetched_connections TO all_connections.
-    dijkstra = new #(
+    dijkstra = NEW #(
       i_no_of_cities = 999
       i_connections  = all_connections
     ).
@@ -60,14 +59,14 @@ CLASS ycl_mb112_router IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD move_to_next_city.
-    last_connection = next_connection.
-    clear: next_connection.
+  METHOD set_gifts_manager.
+    gifts_mngr = i_mngr.
   ENDMETHOD.
 
 
-  METHOD set_gifts_manager.
-    gifts_mngr = i_mngr.
+  METHOD move_to_next_city.
+    last_connection = next_connection.
+    CLEAR: next_connection.
   ENDMETHOD.
 
 
@@ -99,7 +98,7 @@ CLASS ycl_mb112_router IMPLEMENTATION.
     ).
 
     READ TABLE available_trains INDEX prng->get_next( ) INTO DATA(choosen_one).
-    READ TABLE all_connections WITH TABLE KEY BINDING COMPONENTS src = choosen_one-src
+    READ TABLE all_connections WITH TABLE KEY binding COMPONENTS src = choosen_one-src
                                               dest = choosen_one-dest
                                REFERENCE INTO next_connection.
   ENDMETHOD.
@@ -119,7 +118,7 @@ CLASS ycl_mb112_router IMPLEMENTATION.
 
 
   METHOD follow_path.
-    READ TABLE route WITH KEY from = last_connection->dest ASSIGNING field-symbol(<step>).
+    READ TABLE route WITH KEY from = last_connection->dest ASSIGNING FIELD-SYMBOL(<step>).
     IF sy-subrc <> 0.
       RAISE EXCEPTION TYPE ycx_mb12_path_fail.
     ENDIF.
@@ -137,15 +136,15 @@ CLASS ycl_mb112_router IMPLEMENTATION.
 
 
   METHOD set_city_path_by_most_gifts.
-    gifts_mngr->get_loaded_gifts( IMPORTING result = data(loaded_gifts) ).
+    gifts_mngr->get_loaded_gifts( IMPORTING result = DATA(loaded_gifts) ).
     targeted_city = toolset->get_city_wth_most_gifts( loaded_gifts ).
     IF targeted_city = toolset->co_city_not_existing.
       RAISE EXCEPTION TYPE ycx_mb12_path_fail.
     ENDIF.
     route = dijkstra->find_shortest_path(
-              i_from = last_connection->dest
-              i_to   = targeted_city
-            ).
+      i_from = last_connection->dest
+      i_to   = targeted_city
+    ).
   ENDMETHOD.
 
 ENDCLASS.

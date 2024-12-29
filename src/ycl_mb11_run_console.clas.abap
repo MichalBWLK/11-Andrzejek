@@ -14,7 +14,7 @@ ENDCLASS.
 CLASS ycl_mb11_run_console IMPLEMENTATION.
 
   METHOD if_oo_adt_classrun~main.
-    DATA(res_scenario) = CONV int2( 10135 ).
+    DATA(res_scenario) = CONV int2( 10136 ).
 
     DO 1 TIMES.
       res_scenario += 1.

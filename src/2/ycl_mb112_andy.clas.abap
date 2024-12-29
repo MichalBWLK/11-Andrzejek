@@ -1,6 +1,5 @@
 CLASS ycl_mb112_andy DEFINITION
   PUBLIC
-  FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
@@ -22,7 +21,7 @@ CLASS ycl_mb112_andy DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA: gifts TYPE REF TO ycl_mb112_cargo,
-          router TYPE REF TO ycl_mb112_router,
+          router TYPE REF TO ycl_mb112_navigator,
           journal TYPE REF TO ycl_mb11_journal.
 
 *    DATA: all_connections TYPE ycl_mb11_input_reader=>ty_connections.
@@ -40,12 +39,12 @@ ENDCLASS.
 CLASS ycl_mb112_andy IMPLEMENTATION.
 
   METHOD constructor.
-    journal = new ycl_mb11_journal( ).
+    journal = new #( ).
     gifts = new #(
       i_journal  = journal
       i_scenario = i_scenario
     ).
-    router = new ycl_mb112_router(
+    router = new #(
       i_journal        = journal
       i_scenario       = i_scenario
     ).
