@@ -31,6 +31,14 @@ CLASS ycl_mb11_graph_d DEFINITION
       RETURNING
         VALUE(result) TYPE ty_steps
       .
+    METHODS get_all_paths
+      IMPORTING
+        i_from TYPE ymb11_city
+      RETURNING
+        VALUE(result) TYPE ty_paths
+      .
+
+
 
   PROTECTED SECTION.
     DATA: no_of_cities TYPE ymb11_city.
@@ -50,8 +58,7 @@ CLASS ycl_mb11_graph_d DEFINITION
 
     METHODS calculate_dijkstra
       IMPORTING
-        i_from TYPE ymb11_city
-        i_to   TYPE ymb11_city.
+        i_from TYPE ymb11_city.
 
 ENDCLASS.
 
@@ -66,19 +73,37 @@ CLASS ycl_mb11_graph_d IMPLEMENTATION.
 
 
   METHOD find_shortest_path.
-    READ TABLE paths WITH TABLE KEY from = i_from to = i_to ASSIGNING FIELD-SYMBOL(<path>).
+    FIELD-SYMBOLS: <path> TYPE ycl_mb11_graph_d=>ty_path.
+
+    READ TABLE paths WITH TABLE KEY from = i_from to = i_to ASSIGNING <path>.
     IF sy-subrc = 0.
       result = <path>-steps.
       RETURN.
     ENDIF.
     calculate_dijkstra(
       i_from = i_from
-      i_to   = i_to
     ).
     READ TABLE paths WITH TABLE KEY from = i_from to = i_to ASSIGNING <path>.
     IF sy-subrc = 0.
       result = <path>-steps.
       RETURN.
+    ENDIF.
+  ENDMETHOD.
+
+
+  METHOD get_all_paths.
+    FIELD-SYMBOLS: <path> TYPE ycl_mb11_graph_d=>ty_path.
+    LOOP AT paths ASSIGNING <path> WHERE from = i_from .
+      APPEND <path> TO result.
+    ENDLOOP.
+
+    IF sy-subrc <> 0.
+      calculate_dijkstra(
+        i_from = i_from
+      ).
+      LOOP AT paths ASSIGNING <path> WHERE from = i_from .
+        APPEND <path> TO result.
+      ENDLOOP.
     ENDIF.
   ENDMETHOD.
 
@@ -120,8 +145,9 @@ CLASS ycl_mb11_graph_d IMPLEMENTATION.
         ENDIF.
       ENDLOOP.
     ENDDO.
-
+    DELETE TABLE dij_distances WITH TABLE KEY city COMPONENTS city = i_from.
     "store permanent data
+
     LOOP AT dij_distances ASSIGNING FIELD-SYMBOL(<result>).
       paths = VALUE #( BASE paths ( from = i_from
                                     to = <result>-city

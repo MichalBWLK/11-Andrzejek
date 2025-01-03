@@ -13,23 +13,31 @@ CLASS ycl_mb112_andy DEFINITION
         i_no_of_steps TYPE i
       RETURNING
         VALUE(r_time) TYPE i.
+    METHODS get_times_report
+      RETURNING VALUE(result) TYPE string.
     METHODS get_journal
       RETURNING VALUE(result) TYPE string.
     METHODS get_qty_of_remaining_gifts
       RETURNING VALUE(result) TYPE i.
 
   PROTECTED SECTION.
-  PRIVATE SECTION.
     DATA: gifts TYPE REF TO ycl_mb112_cargo,
           router TYPE REF TO ycl_mb112_navigator,
           journal TYPE REF TO ycl_mb11_journal.
 
-*    DATA: all_connections TYPE ycl_mb11_input_reader=>ty_connections.
+    DATA: current_step TYPE i.
+
+    METHODS call_algorithms.
+
+
+  PRIVATE SECTION.
+    DATA: loading_total TYPE int4,
+          unloading_total TYPE int4,
+          waiting_total TYPE int4,
+          travel_total TYPE int4.
 
     DATA: current_time TYPE int4.
 
-
-    METHODS call_algorithms.
     METHODS make_move.
 
 ENDCLASS.
@@ -54,16 +62,27 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
 
 
   METHOD execute.
-    do i_no_of_steps TIMES.
+    DO i_no_of_steps TIMES.
+      current_step = sy-index.
       call_algorithms( ).
+      journal->save_to_journal( ).
+      make_move( ).
       IF gifts->all_gifts IS INITIAL.
         EXIT.
       ENDIF.
     ENDDO.
-    journal->persist_journal( i_scenario = i_scenario
+    journal->persist_journal( i_scenario    = i_scenario
                               i_description = i_scenario_descr
-                              i_time = current_time ).
+                              i_time        = current_time ).
     r_time = current_time.
+  ENDMETHOD.
+
+
+  METHOD get_times_report.
+    result = |loading time: { loading_total }{ cl_abap_char_utilities=>cr_lf }|
+          && |unloading time: { unloading_total }{ cl_abap_char_utilities=>cr_lf }|
+          && |waiting time: { waiting_total }{ cl_abap_char_utilities=>cr_lf }|
+          && |travel time: { travel_total }|.
   ENDMETHOD.
 
 
@@ -105,7 +124,7 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
         IF router->targeted_city IS NOT INITIAL.
           router->follow_path( ).
         ELSE.
-          router->set_city_path_by_most_gifts( ).
+          router->set_rt_to_city_by_most_gifts( ).
           router->follow_path( ).
         ENDIF.
       CATCH ycx_mb12_path_fail.
@@ -118,22 +137,17 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
     journal->set_next_city( router->next_connection->dest ).
 
 
-    IF gifts->all_gifts IS INITIAL.
-      journal->save_to_journal( ).
-      RETURN.
-    ENDIF.
-
-    make_move( ).
-    journal->save_to_journal( ).
   ENDMETHOD.
 
 
   METHOD make_move.
 
     IF gifts->loading_happened = abap_true.
+      loading_total += 2.
       current_time += 2.
     ENDIF.
     IF gifts->unloading_happened = abap_true.
+      unloading_total += 2.
       current_time += 2.
     ENDIF.
 
@@ -147,9 +161,11 @@ CLASS ycl_mb112_andy IMPLEMENTATION.
       WHEN 2.
         interval = 5.
     ENDCASE.
-    DATA(waiting_time) = interval - ( current_time MOD interval ).
+    DATA(waiting_time) = ( interval - ( current_time MOD interval ) ) MOD interval.
 
     current_time = current_time + waiting_time + router->next_connection->time.
+    waiting_total += waiting_time.
+    travel_total += router->next_connection->time.
 
     router->move_to_next_city( ).
     gifts->clear_flags( ).

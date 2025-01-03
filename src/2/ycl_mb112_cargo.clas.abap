@@ -42,6 +42,12 @@ CLASS ycl_mb112_cargo DEFINITION
         i_journal  TYPE REF TO ycl_mb11_journal
         i_scenario TYPE int2.
 
+    METHODS are_gifts_in_city
+      IMPORTING
+        i_city TYPE ymb11_city
+      RETURNING
+        VALUE(result) TYPE abap_bool.
+
 
     "! <p class="shorttext synchronized" lang="en">unload gift when it's in target city</p>
     METHODS unload_simple.
@@ -59,6 +65,9 @@ CLASS ycl_mb112_cargo DEFINITION
       IMPORTING
         i_max_weight TYPE int2 DEFAULT 95
         i_max_volume TYPE int2 DEFAULT 140.
+
+    "! <p class="shorttext synchronized" lang="en">load for the destination city in "next_connection"</p>
+    METHODS load_for_next_city.
 
     "! <p class="shorttext synchronized" lang="en">load gifts destined for the "targetted city" of the router</p>
     METHODS load_for_targetted_city.
@@ -122,6 +131,15 @@ CLASS ycl_mb112_cargo IMPLEMENTATION.
     DATA(input) = NEW ycl_mb11_input_reader( i_scenario ).
     DATA(fetched_gifts) = input->get_gifts( ).
     MOVE-CORRESPONDING fetched_gifts TO all_gifts.
+  ENDMETHOD.
+
+
+  METHOD are_gifts_in_city.
+    LOOP AT all_gifts REFERENCE INTO DATA(gift) USING KEY local_gifts
+                                                WHERE location = i_city AND picked = abap_false.
+      result = abap_true.
+      RETURN.
+    ENDLOOP.
   ENDMETHOD.
 
 
@@ -216,20 +234,14 @@ CLASS ycl_mb112_cargo IMPLEMENTATION.
         RETURN.
       ENDIF.
     ENDLOOP.
-
-    "loop over all un-picked in current location
-*    LOOP AT all_gifts REFERENCE INTO DATA(gift) WHERE location = router->last_connection->dest AND picked = abap_false.
-*      IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
-*        load_a_gift( gift ).
-*      ENDIF.
-*      IF is_fully_loaded( ) = abap_true.
-*        RETURN.
-*      ENDIF.
-*    ENDLOOP.
   ENDMETHOD.
 
 
   METHOD load_simple_limited.
+    IF i_max_weight > max_weight OR i_max_volume > max_volume.
+      RAISE EXCEPTION new ycx_mb112_wrong_params( ).
+    ENDIF.
+
     IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
       RETURN.
     ENDIF.
@@ -240,6 +252,21 @@ CLASS ycl_mb112_cargo IMPLEMENTATION.
       ENDIF.
       IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
         RETURN.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD load_for_next_city.
+    LOOP AT local_gifts INTO DATA(gift).
+      IF toolset->calc_target_city( gift->gift ) = router->next_connection->dest.
+        IF gift->weight <= max_weight - loaded_weight AND gift->volume <= max_volume - loaded_volume.
+          load_a_gift( gift ).
+          DELETE local_gifts.
+        ENDIF.
+        IF is_fully_loaded( ) = abap_true.
+          RETURN.
+        ENDIF.
       ENDIF.
     ENDLOOP.
   ENDMETHOD.
@@ -308,6 +335,10 @@ CLASS ycl_mb112_cargo IMPLEMENTATION.
 
   METHOD load_most_for_one_limited.
     DATA gifts_for_loading TYPE ymb112_gifts.
+
+    IF i_max_weight > max_weight OR i_max_volume > max_volume.
+      RAISE EXCEPTION new ycx_mb112_wrong_params( ).
+    ENDIF.
 
     IF loaded_volume >= i_max_volume OR loaded_weight >= i_max_weight.
       RETURN.

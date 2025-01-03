@@ -32,6 +32,12 @@
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>YCL_MB112_CARGO</CLSNAME>
+     <CMPNAME>LOAD_FOR_NEXT_CITY</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>load for the destination city in &quot;next_connection&quot;</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>YCL_MB112_CARGO</CLSNAME>
      <CMPNAME>LOAD_FOR_PATH_CITIES_FRM_1ST</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>load gifts for cities which are on the set path/route</DESCRIPT>

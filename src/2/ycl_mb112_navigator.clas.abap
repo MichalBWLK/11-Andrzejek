@@ -24,10 +24,20 @@ CLASS ycl_mb112_navigator DEFINITION
       IMPORTING i_mngr TYPE REF TO ycl_mb112_cargo.
     METHODS move_to_next_city.
 
+    "! <p class="shorttext synchronized" lang="en">select nearest city</p>
     METHODS select_closest_city.
+
+    "! <p class="shorttext synchronized" lang="en">select random city</p>
     METHODS select_random_city.
+
+    "! <p class="shorttext synchronized" lang="en">set path to a city with most gifts packed for</p>
+    METHODS set_rt_to_city_by_most_gifts.
+
+    "! <p class="shorttext synchronized" lang="en">set path to the nearest city with available gifts</p>
+    METHODS set_rt_closst_ct_wth_av_gift.
+
+    "! <p class="shorttext synchronized" lang="en">follow path which is set</p>
     METHODS follow_path.
-    METHODS set_city_path_by_most_gifts.
 
   PROTECTED SECTION.
     DATA journal TYPE REF TO ycl_mb11_journal.
@@ -135,16 +145,36 @@ CLASS ycl_mb112_navigator IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD set_city_path_by_most_gifts.
+  METHOD set_rt_to_city_by_most_gifts.
     gifts_mngr->get_loaded_gifts( IMPORTING result = DATA(loaded_gifts) ).
     targeted_city = toolset->get_city_wth_most_gifts( loaded_gifts ).
     IF targeted_city = toolset->co_city_not_existing.
-      RAISE EXCEPTION TYPE ycx_mb12_path_fail.
+      RETURN.
     ENDIF.
     route = dijkstra->find_shortest_path(
       i_from = last_connection->dest
       i_to   = targeted_city
     ).
+*    follow_path( ).
+  ENDMETHOD.
+
+
+  METHOD set_rt_closst_ct_wth_av_gift.
+    DATA paths TYPE STANDARD TABLE OF ycl_mb11_graph_d=>ty_path.
+    paths = dijkstra->get_all_paths( last_connection->dest ).
+    sort paths BY time ASCENDING.
+    targeted_city = toolset->co_city_not_existing.
+    LOOP AT paths ASSIGNING FIELD-SYMBOL(<path>).
+      IF gifts_mngr->are_gifts_in_city( <path>-to ) = abap_true.
+        route = <path>-steps.
+        targeted_city = <path>-to.
+        EXIT.
+      ENDIF.
+    ENDLOOP.
+    IF targeted_city = toolset->co_city_not_existing.
+      RETURN.
+    ENDIF.
+*    follow_path( ).
   ENDMETHOD.
 
 ENDCLASS.
